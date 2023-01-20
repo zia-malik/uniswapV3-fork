@@ -1,10 +1,10 @@
 {
   "_format": "hh-sol-cache-2",
   "files": {
-    "C:\\Users\\moham\\OneDrive\\Documents\\OptimusFox\\hardhat\\contracts\\Tether.sol": {
-      "lastModificationDate": 1673425323890,
-      "contentHash": "50936a44892d08544fd3df8c82b87551",
-      "sourceName": "contracts/Tether.sol",
+    "/home/abdullah/ethereum/foxswap-dex/contracts/SingleSwap.sol": {
+      "lastModificationDate": 1674219808251,
+      "contentHash": "57a15af4af35523085239e94b4157df6",
+      "sourceName": "contracts/SingleSwap.sol",
       "solcConfig": {
         "version": "0.8.17",
         "settings": {
@@ -32,20 +32,20 @@
         }
       },
       "imports": [
-        "@openzeppelin/contracts/token/ERC20/ERC20.sol",
-        "@openzeppelin/contracts/access/Ownable.sol"
+        "@uniswap/v3-periphery/contracts/libraries/TransferHelper.sol",
+        "@uniswap/v3-periphery/contracts/interfaces/ISwapRouter.sol"
       ],
       "versionPragmas": [
-        "^0.8.0"
+        "^0.8.17"
       ],
       "artifacts": [
-        "Tether"
+        "SwapExamples"
       ]
     },
-    "C:\\Users\\moham\\OneDrive\\Documents\\OptimusFox\\hardhat\\node_modules\\@openzeppelin\\contracts\\token\\ERC20\\ERC20.sol": {
-      "lastModificationDate": 1674056994974,
-      "contentHash": "65390c97cf5daa49b7698933d8a67f6d",
-      "sourceName": "@openzeppelin/contracts/token/ERC20/ERC20.sol",
+    "/home/abdullah/ethereum/foxswap-dex/node_modules/@uniswap/v3-periphery/contracts/libraries/TransferHelper.sol": {
+      "lastModificationDate": 1674221671229,
+      "contentHash": "f0616d1842da6584f8454c9b323d777f",
+      "sourceName": "@uniswap/v3-periphery/contracts/libraries/TransferHelper.sol",
       "solcConfig": {
         "version": "0.8.17",
         "settings": {
@@ -73,22 +73,19 @@
         }
       },
       "imports": [
-        "./IERC20.sol",
-        "./extensions/IERC20Metadata.sol",
-        "../../utils/Context.sol",
-        "hardhat/console.sol"
+        "@openzeppelin/contracts/token/ERC20/IERC20.sol"
       ],
       "versionPragmas": [
-        "^0.8.0"
+        ">=0.6.0"
       ],
       "artifacts": [
-        "ERC20"
+        "TransferHelper"
       ]
     },
-    "C:\\Users\\moham\\OneDrive\\Documents\\OptimusFox\\hardhat\\node_modules\\@openzeppelin\\contracts\\access\\Ownable.sol": {
-      "lastModificationDate": 1673425402005,
-      "contentHash": "e436cea06129be2c73cda4b1acc848b5",
-      "sourceName": "@openzeppelin/contracts/access/Ownable.sol",
+    "/home/abdullah/ethereum/foxswap-dex/node_modules/@uniswap/v3-periphery/contracts/interfaces/ISwapRouter.sol": {
+      "lastModificationDate": 1674221671185,
+      "contentHash": "ffd42687b3db01d30c24213d961fcf9f",
+      "sourceName": "@uniswap/v3-periphery/contracts/interfaces/ISwapRouter.sol",
       "solcConfig": {
         "version": "0.8.17",
         "settings": {
@@ -116,55 +113,17 @@
         }
       },
       "imports": [
-        "../utils/Context.sol"
+        "@uniswap/v3-core/contracts/interfaces/callback/IUniswapV3SwapCallback.sol"
       ],
       "versionPragmas": [
-        "^0.8.0"
+        ">=0.7.5"
       ],
       "artifacts": [
-        "Ownable"
+        "ISwapRouter"
       ]
     },
-    "C:\\Users\\moham\\OneDrive\\Documents\\OptimusFox\\hardhat\\node_modules\\@openzeppelin\\contracts\\utils\\Context.sol": {
-      "lastModificationDate": 1673425400294,
-      "contentHash": "5f2c5c4b6af2dd4551027144797bc8be",
-      "sourceName": "@openzeppelin/contracts/utils/Context.sol",
-      "solcConfig": {
-        "version": "0.8.17",
-        "settings": {
-          "optimizer": {
-            "enabled": true,
-            "runs": 5000,
-            "details": {
-              "yul": false
-            }
-          },
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          }
-        }
-      },
-      "imports": [],
-      "versionPragmas": [
-        "^0.8.0"
-      ],
-      "artifacts": [
-        "Context"
-      ]
-    },
-    "C:\\Users\\moham\\OneDrive\\Documents\\OptimusFox\\hardhat\\node_modules\\@openzeppelin\\contracts\\token\\ERC20\\IERC20.sol": {
-      "lastModificationDate": 1673425401475,
+    "/home/abdullah/ethereum/foxswap-dex/node_modules/@openzeppelin/contracts/token/ERC20/IERC20.sol": {
+      "lastModificationDate": 1674221671453,
       "contentHash": "ad7c2d0af148c8f9f097d65deeb4da6b",
       "sourceName": "@openzeppelin/contracts/token/ERC20/IERC20.sol",
       "solcConfig": {
@@ -201,8 +160,46 @@
         "IERC20"
       ]
     },
-    "C:\\Users\\moham\\OneDrive\\Documents\\OptimusFox\\hardhat\\node_modules\\@openzeppelin\\contracts\\token\\ERC20\\extensions\\IERC20Metadata.sol": {
-      "lastModificationDate": 1673425401498,
+    "/home/abdullah/ethereum/foxswap-dex/node_modules/@uniswap/v3-core/contracts/interfaces/callback/IUniswapV3SwapCallback.sol": {
+      "lastModificationDate": 1674221670829,
+      "contentHash": "a8ba2d37b0107911ae0e3b0e123cbd83",
+      "sourceName": "@uniswap/v3-core/contracts/interfaces/callback/IUniswapV3SwapCallback.sol",
+      "solcConfig": {
+        "version": "0.8.17",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 5000,
+            "details": {
+              "yul": false
+            }
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        ">=0.5.0"
+      ],
+      "artifacts": [
+        "IUniswapV3SwapCallback"
+      ]
+    },
+    "/home/abdullah/ethereum/foxswap-dex/node_modules/@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol": {
+      "lastModificationDate": 1674221671453,
       "contentHash": "909ab67fc5c25033fe6cd364f8c056f9",
       "sourceName": "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol",
       "solcConfig": {
@@ -241,8 +238,128 @@
         "IERC20Metadata"
       ]
     },
-    "C:\\Users\\moham\\OneDrive\\Documents\\OptimusFox\\hardhat\\contracts\\WrappedBitcoin.sol": {
-      "lastModificationDate": 1673425323910,
+    "/home/abdullah/ethereum/foxswap-dex/node_modules/@openzeppelin/contracts/token/ERC20/ERC20.sol": {
+      "lastModificationDate": 1674221671241,
+      "contentHash": "834a0dde221759af42b030253315b086",
+      "sourceName": "@openzeppelin/contracts/token/ERC20/ERC20.sol",
+      "solcConfig": {
+        "version": "0.8.17",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 5000,
+            "details": {
+              "yul": false
+            }
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./IERC20.sol",
+        "./extensions/IERC20Metadata.sol",
+        "../../utils/Context.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "ERC20"
+      ]
+    },
+    "/home/abdullah/ethereum/foxswap-dex/node_modules/@openzeppelin/contracts/utils/Context.sol": {
+      "lastModificationDate": 1674221671125,
+      "contentHash": "5f2c5c4b6af2dd4551027144797bc8be",
+      "sourceName": "@openzeppelin/contracts/utils/Context.sol",
+      "solcConfig": {
+        "version": "0.8.17",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 5000,
+            "details": {
+              "yul": false
+            }
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "Context"
+      ]
+    },
+    "/home/abdullah/ethereum/foxswap-dex/node_modules/@openzeppelin/contracts/access/Ownable.sol": {
+      "lastModificationDate": 1674221671473,
+      "contentHash": "e436cea06129be2c73cda4b1acc848b5",
+      "sourceName": "@openzeppelin/contracts/access/Ownable.sol",
+      "solcConfig": {
+        "version": "0.8.17",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 5000,
+            "details": {
+              "yul": false
+            }
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../utils/Context.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "Ownable"
+      ]
+    },
+    "/home/abdullah/ethereum/foxswap-dex/contracts/WrappedBitcoin.sol": {
+      "lastModificationDate": 1674219808251,
       "contentHash": "a558f2c0d2e6b0f2a81d7d8396ad8e18",
       "sourceName": "contracts/WrappedBitcoin.sol",
       "solcConfig": {
@@ -282,8 +399,8 @@
         "WrappedBitcoin"
       ]
     },
-    "C:\\Users\\moham\\OneDrive\\Documents\\OptimusFox\\hardhat\\contracts\\UsdCoin.sol": {
-      "lastModificationDate": 1673425323895,
+    "/home/abdullah/ethereum/foxswap-dex/contracts/UsdCoin.sol": {
+      "lastModificationDate": 1674219808251,
       "contentHash": "59c62a12080a0619863b0071d5d72bb9",
       "sourceName": "contracts/UsdCoin.sol",
       "solcConfig": {
@@ -323,10 +440,10 @@
         "UsdCoin"
       ]
     },
-    "C:\\Users\\moham\\OneDrive\\Documents\\OptimusFox\\hardhat\\contracts\\SingleSwap.sol": {
-      "lastModificationDate": 1673866667594,
-      "contentHash": "354735b76703ae10ac677aaf7b22c824",
-      "sourceName": "contracts/SingleSwap.sol",
+    "/home/abdullah/ethereum/foxswap-dex/contracts/Tether.sol": {
+      "lastModificationDate": 1674219808251,
+      "contentHash": "50936a44892d08544fd3df8c82b87551",
+      "sourceName": "contracts/Tether.sol",
       "solcConfig": {
         "version": "0.8.17",
         "settings": {
@@ -354,170 +471,14 @@
         }
       },
       "imports": [
-        "@uniswap/v3-periphery/contracts/libraries/TransferHelper.sol",
-        "@uniswap/v3-periphery/contracts/interfaces/ISwapRouter.sol"
+        "@openzeppelin/contracts/token/ERC20/ERC20.sol",
+        "@openzeppelin/contracts/access/Ownable.sol"
       ],
       "versionPragmas": [
-        "^0.8.17"
+        "^0.8.0"
       ],
       "artifacts": [
-        "SwapExamples"
-      ]
-    },
-    "C:\\Users\\moham\\OneDrive\\Documents\\OptimusFox\\hardhat\\node_modules\\@uniswap\\v3-periphery\\contracts\\libraries\\TransferHelper.sol": {
-      "lastModificationDate": 1673425399684,
-      "contentHash": "f0616d1842da6584f8454c9b323d777f",
-      "sourceName": "@uniswap/v3-periphery/contracts/libraries/TransferHelper.sol",
-      "solcConfig": {
-        "version": "0.8.17",
-        "settings": {
-          "optimizer": {
-            "enabled": true,
-            "runs": 5000,
-            "details": {
-              "yul": false
-            }
-          },
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          }
-        }
-      },
-      "imports": [
-        "@openzeppelin/contracts/token/ERC20/IERC20.sol"
-      ],
-      "versionPragmas": [
-        ">=0.6.0"
-      ],
-      "artifacts": [
-        "TransferHelper"
-      ]
-    },
-    "C:\\Users\\moham\\OneDrive\\Documents\\OptimusFox\\hardhat\\node_modules\\@uniswap\\v3-periphery\\contracts\\interfaces\\ISwapRouter.sol": {
-      "lastModificationDate": 1673425399259,
-      "contentHash": "ffd42687b3db01d30c24213d961fcf9f",
-      "sourceName": "@uniswap/v3-periphery/contracts/interfaces/ISwapRouter.sol",
-      "solcConfig": {
-        "version": "0.8.17",
-        "settings": {
-          "optimizer": {
-            "enabled": true,
-            "runs": 5000,
-            "details": {
-              "yul": false
-            }
-          },
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          }
-        }
-      },
-      "imports": [
-        "@uniswap/v3-core/contracts/interfaces/callback/IUniswapV3SwapCallback.sol"
-      ],
-      "versionPragmas": [
-        ">=0.7.5"
-      ],
-      "artifacts": [
-        "ISwapRouter"
-      ]
-    },
-    "C:\\Users\\moham\\OneDrive\\Documents\\OptimusFox\\hardhat\\node_modules\\@uniswap\\v3-core\\contracts\\interfaces\\callback\\IUniswapV3SwapCallback.sol": {
-      "lastModificationDate": 1673425398110,
-      "contentHash": "a8ba2d37b0107911ae0e3b0e123cbd83",
-      "sourceName": "@uniswap/v3-core/contracts/interfaces/callback/IUniswapV3SwapCallback.sol",
-      "solcConfig": {
-        "version": "0.8.17",
-        "settings": {
-          "optimizer": {
-            "enabled": true,
-            "runs": 5000,
-            "details": {
-              "yul": false
-            }
-          },
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          }
-        }
-      },
-      "imports": [],
-      "versionPragmas": [
-        ">=0.5.0"
-      ],
-      "artifacts": [
-        "IUniswapV3SwapCallback"
-      ]
-    },
-    "C:\\Users\\moham\\OneDrive\\Documents\\OptimusFox\\hardhat\\node_modules\\hardhat\\console.sol": {
-      "lastModificationDate": 1673425406389,
-      "contentHash": "4ff3cd2f6272c9a6516e9ee4f2b967d3",
-      "sourceName": "hardhat/console.sol",
-      "solcConfig": {
-        "version": "0.8.17",
-        "settings": {
-          "optimizer": {
-            "enabled": true,
-            "runs": 5000,
-            "details": {
-              "yul": false
-            }
-          },
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          }
-        }
-      },
-      "imports": [],
-      "versionPragmas": [
-        ">= 0.4.22 <0.9.0"
-      ],
-      "artifacts": [
-        "console"
+        "Tether"
       ]
     }
   }
