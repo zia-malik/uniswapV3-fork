@@ -2,7 +2,7 @@ SingleSwapToken = "0x0DCd1Bf9A1b36cE34237eEaFef220932846BCD82"
 
 
 const artifacts = {
-    SwapRouter: require("@uniswap/v3-periphery/artifacts/contracts/SwapRouter.sol/SwapRouter.json"),
+    SwapRouter: require("../artifacts/contracts/v3-periphery/contracts/SwapRouter.sol/SwapRouter.json"),
     Usdt: require("../artifacts/contracts/Tether.sol/Tether.json"),
     Usdc: require("../artifacts/contracts/UsdCoin.sol/UsdCoin.json"),
     Swap: require("../artifacts/contracts/SingleSwap.sol/SwapExamples.json"),

@@ -16,7 +16,7 @@ USDT_USDC_500= '0x1FA8DDa81477A5b6FA1b2e149e93ed9C7928992F'
 WBTC_USDC_500=  '0xD8Dc8176F0fC3668527445463bCb6089AbC2CD82'
 
 const artifacts = {
-    SwapRouter: require("@uniswap/v3-periphery/artifacts/contracts/SwapRouter.sol/SwapRouter.json"),
+    SwapRouter: require("../artifacts/contracts/v3-periphery/contracts/SwapRouter.sol/SwapRouter.json"),
     Usdt: require("../artifacts/contracts/Tether.sol/Tether.json"),
     Usdc: require("../artifacts/contracts/UsdCoin.sol/UsdCoin.json"),
     Wbtc: require("../artifacts/contracts/WrappedBitcoin.sol/WrappedBitcoin.json"),
