@@ -1,7 +1,18 @@
 require("@nomiclabs/hardhat-waffle");
+require("./scripts/sampleTask");
 
+const {subtask} = require("hardhat/config");
+const {TASK_COMPILE_SOLIDITY_GET_SOURCE_PATHS} = require("hardhat/builtin-tasks/task-names")
 
+subtask(TASK_COMPILE_SOLIDITY_GET_SOURCE_PATHS)
+  .setAction(async (_, __, runSuper) => {
+    const paths = await runSuper();
 
+    return paths.filter(p => p.includes("v3-periphery"));
+    // return paths.filter(p => p.includes("v3-core"));
+    // return paths.filter(p => p.includes("contracts"));
+
+  });
 
 const LOW_OPTIMIZER_COMPILER_SETTINGS = {
   version: '0.7.6',
@@ -46,45 +57,30 @@ const DEFAULT_COMPILER_SETTINGS = {
 }
 
 
+const CORE_COMPILER_SETTINGS = {
+  version: '0.7.6',
+  settings: {
+    optimizer: {
+      enabled: true,
+      runs: 800,
+    },
+    metadata: {
+      bytecodeHash: 'none',
+    },
+  },
+}
+
+
 
 
 module.exports = {
-  // solidity: {
-  //   // compilers: [
-  //   //   {
-  //   //     version: "=0.7.6",
-  //   //   },
-  //   //   {
-  //   //     version: "0.8.17",
-  //   //   },
-  //   //   {
-  //   //     version: "^0.8.0",
-  //   //   },
-  //   //   {
-  //   //     version: "^0.7.0",
-  //   //   },
-  //   //   {
-  //   //     version: "^0.8.17",
-  //   //   },
-  //   // ],
-  //   // version: "0.8.17",
-  //   settings: {
-  //     optimizer: {
-  //       enabled: true,
-  //       runs: 5000,
-  //       details: { yul: false },
-  //     },
-  //   }
-  // },
-
   solidity: {
     compilers: [DEFAULT_COMPILER_SETTINGS],
+    // compilers: [CORE_COMPILER_SETTINGS],
     overrides: {
-      'contracts/NonfungiblePositionManager.sol': LOW_OPTIMIZER_COMPILER_SETTINGS,
-      'contracts/test/MockTimeNonfungiblePositionManager.sol': LOW_OPTIMIZER_COMPILER_SETTINGS,
-      'contracts/test/NFTDescriptorTest.sol': LOWEST_OPTIMIZER_COMPILER_SETTINGS,
-      'contracts/NonfungibleTokenPositionDescriptor.sol': LOWEST_OPTIMIZER_COMPILER_SETTINGS,
-      'contracts/libraries/NFTDescriptor.sol': LOWEST_OPTIMIZER_COMPILER_SETTINGS,
+      'contracts/v3-periphery/NonfungiblePositionManager.sol': LOW_OPTIMIZER_COMPILER_SETTINGS,
+      'contracts/v3-periphery/NonfungibleTokenPositionDescriptor.sol': LOWEST_OPTIMIZER_COMPILER_SETTINGS,
+      'contracts/v3-periphery/libraries/NFTDescriptor.sol': LOWEST_OPTIMIZER_COMPILER_SETTINGS,
     },
   },
 };

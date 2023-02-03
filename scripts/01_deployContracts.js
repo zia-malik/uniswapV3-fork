@@ -2,12 +2,16 @@ const { Contract, ContractFactory, utils, BigNumber } = require("ethers")
 const WETH9 = require("../WETH9.json")
 
 const artifacts = {
-  UniswapV3Factory: require("@uniswap/v3-core/artifacts/contracts/UniswapV3Factory.sol/UniswapV3Factory.json"),
+  // UniswapV3Factory: require("@uniswap/v3-core/artifacts/contracts/UniswapV3Factory.sol/UniswapV3Factory_.json"),
+  UniswapV3Factory: require("../artifacts/contracts/v3-core/UniswapV3Factory.sol/UniswapV3Factory.json"),
   // SwapRouter: require("@uniswap/v3-periphery/artifacts/contracts/SwapRouter.sol/SwapRouter.json"),
-  SwapRouter: require("../artifacts/contracts/v3-periphery/contracts/SwapRouter.sol/SwapRouter.json"),
-  NFTDescriptor: require("@uniswap/v3-periphery/artifacts/contracts/libraries/NFTDescriptor.sol/NFTDescriptor.json"),
+  SwapRouter: require("../artifacts/contracts/v3-periphery/SwapRouter.sol/SwapRouter.json"),
+  // NFTDescriptor: require("@uniswap/v3-periphery/artifacts/contracts/libraries/NFTDescriptor.sol/NFTDescriptor_.json"),
+  NFTDescriptor: require("../artifacts/contracts/v3-periphery/libraries/NFTDescriptor.sol/NFTDescriptor.json"),
   NonfungibleTokenPositionDescriptor: require("@uniswap/v3-periphery/artifacts/contracts/NonfungibleTokenPositionDescriptor.sol/NonfungibleTokenPositionDescriptor.json"),
-  NonfungiblePositionManager: require("@uniswap/v3-periphery/artifacts/contracts/NonfungiblePositionManager.sol/NonfungiblePositionManager.json"),
+  // NonfungibleTokenPositionDescriptor: require("../artifacts/contracts/v3-periphery/NonfungibleTokenPositionDescriptor.sol/NonfungibleTokenPositionDescriptor.json"),
+  // NonfungiblePositionManager: require("@uniswap/v3-periphery/artifacts/contracts/NonfungiblePositionManager.sol/NonfungiblePositionManager_.json"),
+  NonfungiblePositionManager: require("../artifacts/contracts/v3-periphery/NonfungiblePositionManager.sol/NonfungiblePositionManager.json"),
   WETH9,
 };
 
@@ -77,12 +81,12 @@ async function main() {
   NonfungiblePositionManager = new ContractFactory(artifacts.NonfungiblePositionManager.abi, artifacts.NonfungiblePositionManager.bytecode, owner);
   nonfungiblePositionManager = await NonfungiblePositionManager.deploy(factory.address, weth.address, nonfungibleTokenPositionDescriptor.address);
 
-  console.log('WETH_ADDRESS=', `'${weth.address}'`)
-  console.log('FACTORY_ADDRESS=', `'${factory.address}'`)
-  console.log('SWAP_ROUTER_ADDRESS=', `'${swapRouter.address}'`)
-  console.log('NFT_DESCRIPTOR_ADDRESS=', `'${nftDescriptor.address}'`)
-  console.log('POSITION_DESCRIPTOR_ADDRESS=', `'${nonfungibleTokenPositionDescriptor.address}'`)
-  console.log('POSITION_MANAGER_ADDRESS=', `'${nonfungiblePositionManager.address}'`)
+  console.log('WETH_ADDRESS:', `'${weth.address}',`)
+  console.log('FACTORY_ADDRESS:', `'${factory.address}',`)
+  console.log('SWAP_ROUTER_ADDRESS:', `'${swapRouter.address}',`)
+  console.log('NFT_DESCRIPTOR_ADDRESS:', `'${nftDescriptor.address}',`)
+  console.log('POSITION_DESCRIPTOR_ADDRESS:', `'${nonfungibleTokenPositionDescriptor.address}',`)
+  console.log('POSITION_MANAGER_ADDRESS:', `'${nonfungiblePositionManager.address}',`)
 }
 
 /*

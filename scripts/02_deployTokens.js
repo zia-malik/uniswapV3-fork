@@ -23,9 +23,9 @@ async function main() {
     ethers.utils.parseEther('100000')
   )
 
-  console.log('TETHER_ADDRESS=', `'${tether.address}'`)
-  console.log('USDC_ADDRESS=', `'${usdc.address}'`)
-  console.log('WRAPPED_BITCOIN_ADDRESS=', `'${wrappedBitcoin.address}'`)
+  console.log('TETHER_ADDRESS:', `'${tether.address}',`)
+  console.log('USDC_ADDRESS:', `'${usdc.address}',`)
+  console.log('WRAPPED_BITCOIN_ADDRESS:', `'${wrappedBitcoin.address}',`)
 }
 
 /*
