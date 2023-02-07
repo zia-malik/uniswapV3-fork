@@ -8,8 +8,8 @@ subtask(TASK_COMPILE_SOLIDITY_GET_SOURCE_PATHS)
   .setAction(async (_, __, runSuper) => {
     const paths = await runSuper();
 
-    return paths.filter(p => p.includes("v3-periphery"));
-    // return paths.filter(p => p.includes("v3-core"));
+    // return paths.filter(p => p.includes("v3-periphery"));
+    return paths.filter(p => p.includes("v3-core"));
     // return paths.filter(p => p.includes("contracts"));
 
   });
@@ -75,8 +75,8 @@ const CORE_COMPILER_SETTINGS = {
 
 module.exports = {
   solidity: {
-    compilers: [DEFAULT_COMPILER_SETTINGS],
-    // compilers: [CORE_COMPILER_SETTINGS],
+    // compilers: [DEFAULT_COMPILER_SETTINGS],
+    compilers: [CORE_COMPILER_SETTINGS],
     overrides: {
       'contracts/v3-periphery/NonfungiblePositionManager.sol': LOW_OPTIMIZER_COMPILER_SETTINGS,
       'contracts/v3-periphery/NonfungibleTokenPositionDescriptor.sol': LOWEST_OPTIMIZER_COMPILER_SETTINGS,

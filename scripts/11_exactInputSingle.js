@@ -1,11 +1,9 @@
 const {
   WETH_ADDRESS, FACTORY_ADDRESS, SWAP_ROUTER_ADDRESS, 
   NFT_DESCRIPTOR_ADDRESS, POSITION_DESCRIPTOR_ADDRESS, 
-  POSITION_MANAGER_ADDRESS, TETHER_ADDRESS, USDC_ADDRESS, WRAPPED_BITCOIN_ADDRESS
+  POSITION_MANAGER_ADDRESS, TETHER_ADDRESS, USDC_ADDRESS, WRAPPED_BITCOIN_ADDRESS,
+  POOL_USDT_USDC_500
 } = require('./addresses.js');
-
-// Pool addresses
-USDT_USDC_500= '0x1FA8DDa81477A5b6FA1b2e149e93ed9C7928992F'
 
 const artifacts = {
     SwapRouter: require("../artifacts/contracts/v3-periphery/SwapRouter.sol/SwapRouter.json"),
@@ -74,7 +72,7 @@ async function main(){
 
 
 
-    const poolContract = new Contract(USDT_USDC_500, artifacts.UniswapV3Pool.abi, provider)
+    const poolContract = new Contract(POOL_USDT_USDC_500, artifacts.UniswapV3Pool.abi, provider)
     const poolData = await getPoolData(poolContract)
 
     // console.log("address poolContract: ", poolContract.address)

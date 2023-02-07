@@ -1,12 +1,10 @@
 const {
   WETH_ADDRESS, FACTORY_ADDRESS, SWAP_ROUTER_ADDRESS, 
   NFT_DESCRIPTOR_ADDRESS, POSITION_DESCRIPTOR_ADDRESS, 
-  POSITION_MANAGER_ADDRESS, TETHER_ADDRESS, USDC_ADDRESS, WRAPPED_BITCOIN_ADDRESS
+  POSITION_MANAGER_ADDRESS, TETHER_ADDRESS, USDC_ADDRESS, WRAPPED_BITCOIN_ADDRESS,
+  POOL_USDT_USDC_500, POOL_WBTC_USDC_500, 
 } = require('./addresses.js');
 
-// Pool addresses
-USDT_USDC_500= '0x1FA8DDa81477A5b6FA1b2e149e93ed9C7928992F'
-WBTC_USDC_500= '0xD8Dc8176F0fC3668527445463bCb6089AbC2CD82'
 
 const artifacts = {
     SwapRouter: require("../artifacts/contracts/v3-periphery/SwapRouter.sol/SwapRouter.json"),
@@ -14,6 +12,7 @@ const artifacts = {
     Usdc: require("../artifacts/contracts/UsdCoin.sol/UsdCoin.json"),
     Wbtc: require("../artifacts/contracts/WrappedBitcoin.sol/WrappedBitcoin.json"),
     UniswapV3Pool: require("@uniswap/v3-core/artifacts/contracts/UniswapV3Pool.sol/UniswapV3Pool.json"),
+    NonfungiblePositionManager: require("@uniswap/v3-periphery/artifacts/contracts/NonfungiblePositionManager.sol/NonfungiblePositionManager.json"),
   };
 
 const { Contract } = require("ethers")
@@ -42,12 +41,12 @@ async function getPoolData(poolContract) {
     }
   }
 
-  async function exectInputSingle(signer, swaprouter, tokenInContract, tokenOutContract, poolData, amountIn ){
+  async function exectInputSingle(signer, swaprouter, tokenInContract, tokenOutContract, inAddress, outAddress, poolData, amountIn ){
     await tokenInContract.connect(signer).approve(SWAP_ROUTER_ADDRESS, amountIn.toString())
 
     paramsExectInputSingle = {
-      tokenIn: TETHER_ADDRESS,
-      tokenOut: USDC_ADDRESS,
+      tokenIn: inAddress,
+      tokenOut: outAddress,
       fee: poolData.fee,
       recipient: signer.address,
       deadline: Math.floor(Date.now() / 1000) + (60 * 10),
@@ -74,7 +73,7 @@ async function getPoolData(poolContract) {
 
 
   async function exectOutputSingle(signer, swaprouter, tokenInContract, tokenOutContract, poolData, amountInMaximum, amountOut){
-    await tokenInContract.connect(signer).approve(SWAP_ROUTER_ADDRESS, amountInMaximum.toString())
+    await tokenInContract.connect(signer).approve(SWAP_ROUTER_ADDRESS, amountInMaximum.toString());
 
     paramsExectOutputSingle = {
       tokenIn: TETHER_ADDRESS,
@@ -176,11 +175,10 @@ async function main(){
     const usdcContract = new Contract(USDC_ADDRESS,artifacts.Usdc.abi,provider);
     const wbtcContract = new Contract(WRAPPED_BITCOIN_ADDRESS,artifacts.Wbtc.abi,provider);
 
-    const poolContract_WBTC_USDC_500 = new Contract(WBTC_USDC_500, artifacts.UniswapV3Pool.abi, provider);
+    const poolContract_WBTC_USDC_500 = new Contract(POOL_WBTC_USDC_500, artifacts.UniswapV3Pool.abi, provider);
     const poolData = await getPoolData(poolContract_WBTC_USDC_500);
   
-    USDT_USDC_500= '0x1FA8DDa81477A5b6FA1b2e149e93ed9C7928992F'
-    const poolContract_USDT_USDC_500 = new Contract(USDT_USDC_500, artifacts.UniswapV3Pool.abi, provider);
+    const poolContract_USDT_USDC_500 = new Contract(POOL_USDT_USDC_500, artifacts.UniswapV3Pool.abi, provider);
 
     const swaprouter = new ethers.Contract(
         SWAP_ROUTER_ADDRESS, 
@@ -189,10 +187,12 @@ async function main(){
     );
 
 
-    await exectInputSingle(signer2, swaprouter, usdtContract, usdcContract, poolData, 10000);
+    // await exectInputSingle(signer2, swaprouter, usdtContract, usdcContract, TETHER_ADDRESS, USDC_ADDRESS, poolData, 100000);
     // await exectOutputSingle(signer2, swaprouter, usdtContract, usdcContract, poolData, 1000000, 999);
     // await exactInputMultiHope(signer2, swaprouter, wbtcContract, usdtContract, poolData, 10000);
     // await exactOutputMultiHope(signer2, swaprouter, wbtcContract, usdtContract, poolData, 1000000, 999);
+    // await exectInputSingle(signer2, swaprouter, wbtcContract, usdcContract, WRAPPED_BITCOIN_ADDRESS, USDC_ADDRESS, poolData, 10000000);
+
 
 
     // await getPoolData(poolContract_WBTC_USDC_500);
@@ -202,14 +202,26 @@ async function main(){
     // console.log("collect protocolFees logs: ", (await tx.wait()).events.find(event => event.event === 'SetFeeProtocol').args);
 
 
-    console.log("protocolFees WBTC_USDC_500: ", await poolContract_WBTC_USDC_500.protocolFees());
+    console.log("\nprotocolFees WBTC_USDC_500: ", await poolContract_WBTC_USDC_500.protocolFees());
 
-    // const tx =  await poolContract_WBTC_USDC_500.connect(owner).collectProtocol(owner.address, 100, 100);
-    // console.log("set protocolFees logs: ", (await tx.wait()).events.find(event => event.event === 'CollectProtocol').args);
+    const tx =  await poolContract_WBTC_USDC_500.connect(owner).collectProtocol(owner.address, 100, 100);
+    console.log("set protocolFees logs: ", (await tx.wait()).events.find(event => event.event === 'CollectProtocol').args);
 
 
 
-    console.log("protocolFees USDT_USDC_500: ", await poolContract_USDT_USDC_500.protocolFees());
+    // console.log("\nprotocolFees USDT_USDC_500: ", await poolContract_USDT_USDC_500.protocolFees());
+
+    // const nonfungiblePositionManager = new Contract(
+    //   POSITION_MANAGER_ADDRESS,
+    //   artifacts.NonfungiblePositionManager.abi,
+    //   provider
+    // );
+
+    // console.log("\n\nget token 1 info: ", await nonfungiblePositionManager.connect(owner).positions(1));
+    // console.log("\n\nget token 2 info: ", await nonfungiblePositionManager.connect(owner).positions(2));
+    // console.log("\n\nget token 3 info: ", await nonfungiblePositionManager.connect(owner).positions(3));
+
+
 
 
 }

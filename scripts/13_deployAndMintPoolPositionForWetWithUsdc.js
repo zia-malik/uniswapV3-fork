@@ -1,7 +1,8 @@
 const {
   WETH_ADDRESS, FACTORY_ADDRESS, SWAP_ROUTER_ADDRESS, 
   NFT_DESCRIPTOR_ADDRESS, POSITION_DESCRIPTOR_ADDRESS, 
-  POSITION_MANAGER_ADDRESS, TETHER_ADDRESS, USDC_ADDRESS, WRAPPED_BITCOIN_ADDRESS
+  POSITION_MANAGER_ADDRESS, TETHER_ADDRESS, USDC_ADDRESS, WRAPPED_BITCOIN_ADDRESS,
+  POOL_USDT_USDC_500
 } = require('./addresses.js');
 
 const artifacts = {
@@ -164,8 +165,8 @@ async function mintNewPossition(signer, poolContract) {
   const receipt = await tx.wait()
   const event1 = await receipt.events[6];
   console.log("EVENT1 args: ", event1.args)
-  let value = event1.args[0]
-  console.log("VALUE: ", value)
+  let tokenId = event1.args[0]
+  console.log("TokenId: ", tokenId)
 }
 
 

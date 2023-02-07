@@ -1,11 +1,10 @@
 const {
   WETH_ADDRESS, FACTORY_ADDRESS, SWAP_ROUTER_ADDRESS, 
   NFT_DESCRIPTOR_ADDRESS, POSITION_DESCRIPTOR_ADDRESS, 
-  POSITION_MANAGER_ADDRESS, TETHER_ADDRESS, USDC_ADDRESS, WRAPPED_BITCOIN_ADDRESS
+  POSITION_MANAGER_ADDRESS, TETHER_ADDRESS, USDC_ADDRESS, WRAPPED_BITCOIN_ADDRESS,
+  POOL_USDT_USDC_500
 } = require('./addresses.js');
 
-// Pool addresses
-USDT_USDC_500= '0x1FA8DDa81477A5b6FA1b2e149e93ed9C7928992F'
 
 const artifacts = {
   NonfungiblePositionManager: require("@uniswap/v3-periphery/artifacts/contracts/NonfungiblePositionManager.sol/NonfungiblePositionManager.json"),
@@ -46,13 +45,7 @@ async function main(){
     const [owner, signer2] = await ethers.getSigners();
     const provider = waffle.provider;
 
-    const usdtContract = new Contract(TETHER_ADDRESS,artifacts.Usdt.abi,provider)
-    const usdcContract = new Contract(USDC_ADDRESS,artifacts.Usdc.abi,provider)
-
-    await usdtContract.connect(signer2).approve(POSITION_MANAGER_ADDRESS, ethers.utils.parseEther('1000'))
-    await usdcContract.connect(signer2).approve(POSITION_MANAGER_ADDRESS, ethers.utils.parseEther('1000'))
-
-    const poolContract = new Contract(USDT_USDC_500, artifacts.UniswapV3Pool.abi, provider)
+    const poolContract = new Contract(POOL_USDT_USDC_500, artifacts.UniswapV3Pool.abi, provider)
 
     const poolData = await getPoolData(poolContract)
     console.log("POOL DATA", poolData);
@@ -61,7 +54,7 @@ async function main(){
     const UsdcToken = new Token(31337, USDC_ADDRESS, 18, 'USDC', 'UsdCoin')
 
     params = {
-    tokenId: 1,
+    tokenId: 3,
     recipient:   signer2.address,
     amount0Max:  1,
     amount1Max:  1,
@@ -73,25 +66,13 @@ async function main(){
     artifacts.NonfungiblePositionManager.abi,
     provider
     )//   console.log("HERE3", signer2)
-    const gasLimit = 218520
-    console.log("gas is =",gasLimit);
-    console.log("Param 0", params.amount0Max);
-    console.log("Param 1", params.amount1Max);
-
+    const gasLimit = 838520
     const tx = await nonfungiblePositionManager.connect(signer2).collect(params, {gasLimit})
 
+    // Collect
+
     console.log("HERE4", tx)
-    const receipt = await tx.wait()
-    const event1 = await receipt.events[2];
-    console.log("EVENT1-----------", event1)
-    let value1 = event1.args[0]
-    console.log("VALUE1---------", value1)
-    let value2 = event1.args[1]
-    console.log("VALUE2---------", value2)
-    let value3 = event1.args[2]
-    console.log("VALUE3---------", value3)
-    let value4 = event1.args[3]
-    console.log("VALUE4---------", value4)
+    console.log("Collect logs: ", (await tx.wait()).events.find(event => event.event === 'Collect').args);
 }
 
 /*
