@@ -5,14 +5,11 @@ const {
   POOL_USDT_USDC_500
 } = require('./addresses.js');
 
-const artifacts = {
-  NonfungiblePositionManager: require("@uniswap/v3-periphery/artifacts/contracts/NonfungiblePositionManager.sol/NonfungiblePositionManager.json"),
-  Usdt: require("../artifacts/contracts/Tether.sol/Tether.json"),
-  Usdc: require("../artifacts/contracts/UsdCoin.sol/UsdCoin.json"),
-  UniswapV3Pool: require("@uniswap/v3-core/artifacts/contracts/UniswapV3Pool.sol/UniswapV3Pool.json"),
-};
+const {
+  NonfungiblePositionManager_Contract, Factory_Contract, Usdt_Contract, Usdc_Contract,
+  PoolContract
+} = require('./contractInstances');
 
-const { Contract } = require("ethers")
 const { Token } = require('@uniswap/sdk-core')
 const { Pool, Position, nearestUsableTick } = require('@uniswap/v3-sdk')
 const { ethers } = require("hardhat")
@@ -41,15 +38,11 @@ async function getPoolData(poolContract) {
 async function main() {
 
   const [owner, signer2] = await ethers.getSigners();
-  const provider = waffle.provider;
 
-  const usdtContract = new Contract(TETHER_ADDRESS,artifacts.Usdt.abi,provider)
-  const usdcContract = new Contract(USDC_ADDRESS,artifacts.Usdc.abi,provider)
+  await Usdt_Contract.connect(signer2).approve(POSITION_MANAGER_ADDRESS, ethers.utils.parseEther('1000'))
+  await Usdc_Contract.connect(signer2).approve(POSITION_MANAGER_ADDRESS, ethers.utils.parseEther('1000'))
 
-  await usdtContract.connect(signer2).approve(POSITION_MANAGER_ADDRESS, ethers.utils.parseEther('1000'))
-  await usdcContract.connect(signer2).approve(POSITION_MANAGER_ADDRESS, ethers.utils.parseEther('1000'))
-
-  const poolContract = new Contract(POOL_USDT_USDC_500, artifacts.UniswapV3Pool.abi, provider)
+  const poolContract = PoolContract(POOL_USDT_USDC_500);
 
   const poolData = await getPoolData(poolContract)
   console.log("POOL DATA", poolData);
@@ -79,13 +72,7 @@ async function main() {
     tokenId: 1,
   }
 
-  const nonfungiblePositionManager = new ethers.Contract(
-    POSITION_MANAGER_ADDRESS,
-    artifacts.NonfungiblePositionManager.abi,
-    provider
-  )
-
-  const tx = await nonfungiblePositionManager.connect(signer2).burn(
+  const tx = await NonfungiblePositionManager_Contract.connect(signer2).burn(
     params,
     { gasLimit: '1000000' }
   )
@@ -93,14 +80,11 @@ async function main() {
 
   const receipt = await tx.wait()
   const event1 = await receipt.events[6];
-  console.log("EVENT1-----------", event1)
-  let value = event1.args[0]
-  console.log("VALUE---------", value)
-
+  console.log("EVENT1-----------", event1);
 }
 
 /*
-npx hardhat run --network localhost scripts/04_addLiquidity.js
+npx hardhat run --network localhost scripts/10_burnPosition.js 
 */
 
 main()

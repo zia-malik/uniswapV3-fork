@@ -5,15 +5,14 @@ const {
   POOL_USDT_USDC_500
 } = require('./addresses.js');
 
-const artifacts = {
-  NonfungiblePositionManager: require("@uniswap/v3-periphery/artifacts/contracts/NonfungiblePositionManager.sol/NonfungiblePositionManager.json"),
-  Wbtc: require("../artifacts/contracts/WrappedBitcoin.sol/WrappedBitcoin.json"),
-  Usdc: require("../artifacts/contracts/UsdCoin.sol/UsdCoin.json"),
-  UniswapV3Factory: require("../artifacts/contracts/v3-core/UniswapV3Factory.sol/UniswapV3Factory.json"),
-  UniswapV3Pool: require("@uniswap/v3-core/artifacts/contracts/UniswapV3Pool.sol/UniswapV3Pool.json"),
-};
 
-const { Contract, BigNumber } = require("ethers")
+const {
+  NonfungiblePositionManager_Contract, Factory_Contract, Usdt_Contract, Usdc_Contract,
+  WBTC_Contract, PoolContract, SwapRouter_Contract
+} = require('./contractInstances');
+
+
+const { BigNumber } = require("ethers")
 const { Token } = require('@uniswap/sdk-core')
 const { Pool, Position, nearestUsableTick } = require('@uniswap/v3-sdk')
 const { ethers } = require("hardhat")
@@ -23,8 +22,6 @@ const { ethers } = require("hardhat")
 // deploy pool
 const bn = require('bignumber.js')
 bn.config({ EXPONENTIAL_AT: 999999, DECIMAL_PLACES: 40 })
-
-const provider = waffle.provider;
 
 function encodePriceSqrt(reserve1, reserve0) {
   return BigNumber.from(
@@ -37,28 +34,18 @@ function encodePriceSqrt(reserve1, reserve0) {
   )
 }
 
-const nonfungiblePositionManager = new Contract(
-  POSITION_MANAGER_ADDRESS,
-  artifacts.NonfungiblePositionManager.abi,
-  provider
-)
-const factory = new Contract(
-  FACTORY_ADDRESS,
-  artifacts.UniswapV3Factory.abi,
-  provider
-)
 
 async function deployPool(token0, token1, fee, price) {
   
   const [owner] = await ethers.getSigners();
-  await nonfungiblePositionManager.connect(owner).createAndInitializePoolIfNecessary(
+  await NonfungiblePositionManager_Contract.connect(owner).createAndInitializePoolIfNecessary(
     token0,
     token1,
     fee,
     price,
     { gasLimit: 5000000 }
   )
-  const poolAddress = await factory.connect(owner).getPool(
+  const poolAddress = await Factory_Contract.connect(owner).getPool(
     token0,
     token1,
     fee,
@@ -101,13 +88,8 @@ async function getPoolData(poolContract) {
 
 async function mintNewPossition(signer, poolContract) {
 
-  const provider = waffle.provider;
-
-  const wbtcContract = new Contract(WRAPPED_BITCOIN_ADDRESS,artifacts.Wbtc.abi,provider);
-  const usdcContract = new Contract(USDC_ADDRESS,artifacts.Usdc.abi,provider);
-
-  await wbtcContract.connect(signer).approve(POSITION_MANAGER_ADDRESS, ethers.utils.parseEther('10000'));
-  await usdcContract.connect(signer).approve(POSITION_MANAGER_ADDRESS, ethers.utils.parseEther('10000'));
+  await WBTC_Contract.connect(signer).approve(POSITION_MANAGER_ADDRESS, ethers.utils.parseEther('10000'));
+  await Usdc_Contract.connect(signer).approve(POSITION_MANAGER_ADDRESS, ethers.utils.parseEther('10000'));
 
   const poolData = await getPoolData(poolContract);
 
@@ -121,8 +103,8 @@ async function mintNewPossition(signer, poolContract) {
     poolData.sqrtPriceX96.toString(),
     poolData.liquidity.toString(),
     poolData.tick
-  )
-    console.log("Get pool: ")
+  );
+
   const tickLower = nearestUsableTick(poolData.tick, poolData.tickSpacing) - poolData.tickSpacing * 2;
   const tickUpper = nearestUsableTick(poolData.tick, poolData.tickSpacing) + poolData.tickSpacing * 2;
 
@@ -150,14 +132,8 @@ async function mintNewPossition(signer, poolContract) {
     deadline: Math.floor(Date.now() / 1000) + (60 * 10)
   }
 
-  const nonfungiblePositionManager = new ethers.Contract(
-    POSITION_MANAGER_ADDRESS,
-    artifacts.NonfungiblePositionManager.abi,
-    provider
-  )
 
-
-  const tx = await nonfungiblePositionManager.connect(signer).mint(
+  const tx = await NonfungiblePositionManager_Contract.connect(signer).mint(
     params,
     { gasLimit: '1000000' }
   )
@@ -181,7 +157,7 @@ async function main() {
   // wbtcUsdc500 = "0xD8Dc8176F0fC3668527445463bCb6089AbC2CD82";
 
   // setFeeProtocol
-  const poolContract = new Contract(wbtcUsdc500, artifacts.UniswapV3Pool.abi, provider);
+  const poolContract = PoolContract(wbtcUsdc500);
   const tx =  await poolContract.connect(owner).setFeeProtocol(10, 10);
   console.log("set protocolFees logs: ", (await tx.wait()).events.find(event => event.event === 'SetFeeProtocol').args);
 

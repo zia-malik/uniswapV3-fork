@@ -5,15 +5,12 @@ const {
   POOL_USDT_USDC_500
 } = require('./addresses.js');
 
+const {
+  NonfungiblePositionManager_Contract, Factory_Contract, Usdt_Contract, Usdc_Contract,
+  PoolContract
+} = require('./contractInstances');
 
-const artifacts = {
-  NonfungiblePositionManager: require("@uniswap/v3-periphery/artifacts/contracts/NonfungiblePositionManager.sol/NonfungiblePositionManager.json"),
-  Usdt: require("../artifacts/contracts/Tether.sol/Tether.json"),
-  Usdc: require("../artifacts/contracts/UsdCoin.sol/UsdCoin.json"),
-  UniswapV3Pool: require("@uniswap/v3-core/artifacts/contracts/UniswapV3Pool.sol/UniswapV3Pool.json"),
-};
 
-const { Contract } = require("ethers")
 const { Token } = require('@uniswap/sdk-core')
 const { Pool, Position, nearestUsableTick } = require('@uniswap/v3-sdk')
 const { ethers } = require("hardhat")
@@ -45,33 +42,22 @@ async function main(){
     const [owner, signer2] = await ethers.getSigners();
     const provider = waffle.provider;
 
-    const poolContract = new Contract(POOL_USDT_USDC_500, artifacts.UniswapV3Pool.abi, provider)
+    const poolContract = PoolContract(POOL_USDT_USDC_500);
 
     const poolData = await getPoolData(poolContract)
     console.log("POOL DATA", poolData);
 
-    const UsdtToken = new Token(31337, TETHER_ADDRESS, 18, 'USDT', 'Tether')
-    const UsdcToken = new Token(31337, USDC_ADDRESS, 18, 'USDC', 'UsdCoin')
-
     params = {
-    tokenId: 3,
+    tokenId: 1,
     recipient:   signer2.address,
     amount0Max:  1,
     amount1Max:  1,
     }
-    // ethers.BigNumber.from('1000000')
-    console.log("HERE2", params)  
-    const nonfungiblePositionManager = new ethers.Contract(
-    POSITION_MANAGER_ADDRESS,
-    artifacts.NonfungiblePositionManager.abi,
-    provider
-    )//   console.log("HERE3", signer2)
-    const gasLimit = 838520
-    const tx = await nonfungiblePositionManager.connect(signer2).collect(params, {gasLimit})
+ 
+    const gasLimit = 238520
+    const tx = await NonfungiblePositionManager_Contract.connect(signer2).collect(params, {gasLimit})
 
     // Collect
-
-    console.log("HERE4", tx)
     console.log("Collect logs: ", (await tx.wait()).events.find(event => event.event === 'Collect').args);
 }
 
