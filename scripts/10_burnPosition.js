@@ -6,8 +6,7 @@ const {
 } = require('./addresses.js');
 
 const {
-  NonfungiblePositionManager_Contract, Factory_Contract, Usdt_Contract, Usdc_Contract,
-  PoolContract
+  NonfungiblePositionManager_Contract,  PoolContract
 } = require('./contractInstances');
 
 const { Token } = require('@uniswap/sdk-core')
@@ -38,9 +37,6 @@ async function getPoolData(poolContract) {
 async function main() {
 
   const [owner, signer2] = await ethers.getSigners();
-
-  await Usdt_Contract.connect(signer2).approve(POSITION_MANAGER_ADDRESS, ethers.utils.parseEther('1000'))
-  await Usdc_Contract.connect(signer2).approve(POSITION_MANAGER_ADDRESS, ethers.utils.parseEther('1000'))
 
   const poolContract = PoolContract(POOL_USDT_USDC_500);
 
