@@ -4,7 +4,7 @@
 **Step by step guideline for clone the uniswapV3:**
 
 
-### 1. create hardhat project
+## 1. create hardhat project
 ```
 mkdir [project-name]
 cd [project-name]
@@ -14,7 +14,7 @@ npx hardhat
 then select [Create an empty hardhat.config.js]
 ```
 
-### 2. add dependencies in `package.json`
+## 2. add dependencies in `package.json`
 ```
 "dependencies": {
     "@openzeppelin/contracts": "3.4.2-solc-0.7",
@@ -33,17 +33,17 @@ then select [Create an empty hardhat.config.js]
   },
 ```
 
-### 3. create interface for wrappe ether 
+## 3. create interface for wrappe ether 
 `contracts/interfaces/IWETH.sol`
 
-### 4. create some ERC20 tokens for deploy and swap on our cloned uniswapV3:
+## 4. create some ERC20 tokens for deploy and swap on our cloned uniswapV3:
 ```
 contracts/Tether.sol
 contracts/UsdcCoin.sol
 contracts/WrappedBitcoin.sol
 ```
 
-### 5. run hardhat node 
+## 5. run hardhat node 
 `npx hardhat node`
 <br>
 <br>
@@ -53,7 +53,7 @@ fork goerli `npx hardhat node --fork https://eth-goerli.g.alchemy.com/v2/Pk45XQq
 
 
 
-### 6. run deploy script 1:
+## 6. run deploy script 1:
 `npx hardhat run --network localhost scripts/01_deployContracts.js` in this script use `uniswapV3 npm packages` and deploy these contracts and save their addresses in `scripts/addresses.js`<br>
 
 
@@ -172,24 +172,24 @@ module.exports = {
   3. **SwapRouter:** `SwapRouter` is part of v3-periphery contracts deploy with passing the `UniswapV3Factory` and `WETH` address and it's use for swap between different tokens and `SwapRouter` internaly call that specific `UniswapV3Pool` contract which is the pasrt of v3-core
 
 
-  4. **NFTDescriptor:** `NFTDescriptor` is part of v3-periphery contracts deploy witout any constructor perameter and it's use for
+  4. **NFTDescriptor:** `NFTDescriptor` is part of v3-periphery contracts deploy witout any constructor perameter and it's use for deploy `NonfungibleTokenPositionDescriptor` and also use for fee, convert some values to strings.
 
-  5. **NonfungibleTokenPositionDescriptor:** `NonfungibleTokenPositionDescriptor` is part of v3-periphery contracts
+  5. **NonfungibleTokenPositionDescriptor:** `NonfungibleTokenPositionDescriptor` is part of v3-periphery contracts deploy with passing the `WETH` address and it's use for manage the metadata.
 
-  6. **NonfungiblePositionManager:**  `NonfungiblePositionManager` is part of v3-periphery contracts
+  6. **NonfungiblePositionManager:**  `NonfungiblePositionManager` is part of v3-periphery contracts deploy with passing the `UniswapV3Factory`, `WETH` and `NonfungibleTokenPositionDescriptor` address and it's use for create new pool and manage the existing pool.
 
 
 
-### 7. run deploy script 2:
+## 7. run deploy script 2:
 `npx hardhat run --network localhost scripts/02_deployTokens.js` in this script we deploy 3 tokens Tether, Usdc and WrappedBitcoin. After deploying these contracts save their addresses in `scripts/addresses.js`<br>
 
 
-## create instance of all deployed contracts:
+## 8. create instance of all deployed contracts:
 In `scripts/contractInstances.js` script fetch all the ABIs from artifacts and fetch the all deployed contracts addresses and create the instance for each contract then use these instance in all scripts.
 
 
 
-### 8. Create new pool and add liqudity:
+## 9. Create new pool and add liqudity:
 After deploying the contract now our DEX is running now we will do these tasks one by one:
 
 #### 1. create new pool: 
@@ -254,7 +254,7 @@ run `npx hardhat run --network localhost scripts/10_burnPosition.js` in this scr
 
 
 
-### 9. Swap using exactInputSingle and exactOutputSingle:
+## 10. Swap using exactInputSingle and exactOutputSingle:
 
 #### 1. swap: 
 run `npx hardhat run --network localhost scripts/11_exactInputSingle.js` in this script we use `Usdt Contract` instance for give the approval to `SWAP_ROUTER_ADDRESS` and use `Pool Contract` for getting the pool info and use `SwapRouter Contract` and instance and it's method `exactInputSingle` and `exactOutputSingle` for swap the tokens these methods get the signer and also get these perams:
@@ -278,7 +278,7 @@ run `npx hardhat run --network localhost scripts/08_collectFee.js` in this scrip
 
 
 
-### 10. create an other pool and swap using multihope:
+## 11. create an other pool and swap using multihope:
 
 #### 1. deploy an other pool: 
  run `npx hardhat run --network localhost scripts/13_deployAndMintPoolPositionForWetWithUsdc.js` in this script we use `Usdt and WRAPPED_BITCOIN` contracts instance for giving the token approval to `v3 possition manager` and use `NonfungiblePositionManager` Contract's method `createAndInitializePoolIfNecessary` for creating the pool and this method get the signer and perametters that we methion in `create new pool` topic then use `Pool Contract` instance for getting the pool info and we will set the protocole fee using the `setFeeProtocol` method of this contract and we use `NonfungiblePositionManager Contract` and use the `mint` method of this contract that will mint the new possition and provide liquid and return the NFT according to our liqudity this `mint` method get the signer and get perams that we methion in `mint new possition and provide liqudity` topic.
@@ -302,7 +302,7 @@ in previos script `14_multihopeSwapUsingExactInputAndOutput.js` we set the proto
 
 
 
-### 11. fetch uniswapV3 pools data using GraphQL:
+## 12. fetch uniswapV3 pools data using GraphQL:
 run `npx hardhat run fetch-uniswapV3-pools.js` in this script we simpaly use GraphQL API for getting uniswap pools.
 
 
@@ -314,6 +314,24 @@ We run the fork node using `npx hardhat node --fork https://eth-goerli.g.alchemy
 
 
 
+## 12. Some features or functions:
+  1. **deployNewPool:** NonfungiblePositionManagerContract.createAndInitializePoolIfNecessary()
+  2. **verifyPool:** FactoryContract.getPool()
+  3. **mintNewPossition:** NonfungiblePositionManagerContract.mint()
+  4. **increaseLiqudity:** NonfungiblePositionManagerContract.increaseLiquidity()
+  5. **decreaseLiqudity:** NonfungiblePositionManagerContract.decreaseLiquidity()
+  6. **burnPossition:** NonfungiblePositionManagerContract.burn()
+  7. **getPoolData:** PoolContract. (token0, token1, tickSpacing, fee, liquidity, slot0)
+  8. **collectPoolFee:** NonfungiblePositionManagerContract.collect()
+  9. **setProtocolFee:** PoolContract.setFeeProtocol()
+  10. **getProtocolFee:** PoolContract.protocolFees()
+  11. **collectProtocolFee:** PoolContract.collectProtocol()
+  12. **getNftTokenData:** NonfungiblePositionManagerContract.positions()
+  13. **swapUsingExactInputSingle:** SwapRouterContract.exactInputSingle()
+  14. **swapUsingExactOutputSingle:** SwapRouterContract.exactOutputSingle()
+  15. **swapUsingExactInputSingle:** SwapRouterContract.exactInput()
+  16. **swapUsingExactInputSingle:** SwapRouterContract.exactOutput() 
+  
 
 
 
