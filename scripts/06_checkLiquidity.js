@@ -1,8 +1,14 @@
-// pool
-USDT_USDC_500= '0x1FA8DDa81477A5b6FA1b2e149e93ed9C7928992F'
+const {
+  WETH_ADDRESS, FACTORY_ADDRESS, SWAP_ROUTER_ADDRESS, 
+  NFT_DESCRIPTOR_ADDRESS, POSITION_DESCRIPTOR_ADDRESS, 
+  POSITION_MANAGER_ADDRESS, TETHER_ADDRESS, USDC_ADDRESS, WRAPPED_BITCOIN_ADDRESS,
+  POOL_USDT_USDC_500
+} = require('./addresses.js');
 
-const UniswapV3Pool = require("@uniswap/v3-core/artifacts/contracts/UniswapV3Pool.sol/UniswapV3Pool.json")
-const { Contract } = require("ethers")
+const {
+  NonfungiblePositionManager_Contract, Factory_Contract, Usdt_Contract, Usdc_Contract,
+  PoolContract
+} = require('./contractInstances');
 
 async function getPoolData(poolContract) {
   const [tickSpacing, fee, liquidity, slot0] = await Promise.all([
@@ -24,9 +30,9 @@ async function getPoolData(poolContract) {
 
 async function main() {
   const provider = waffle.provider;
-  const poolContract = new Contract(USDT_USDC_500, UniswapV3Pool.abi, provider)
-  const poolData = await getPoolData(poolContract)
-  console.log('poolData', poolData)
+  const poolContract = PoolContract(POOL_USDT_USDC_500);
+  const poolData = await getPoolData(poolContract);
+  console.log('poolData', poolData);
 }
 
 /*
