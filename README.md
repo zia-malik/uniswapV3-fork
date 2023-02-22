@@ -307,14 +307,14 @@ run `npx hardhat run fetch-uniswapV3-pools.js` in this script we simpaly use Gra
 
 
 
-### 12. fork mainnet or goerli and swap on existing pool:
+## 13. fork mainnet or goerli and swap on existing pool:
 run `npx hardhat run fork-mainnet-pools.js` in this script we fork the live network and use the existing contracts addresses and existing tokens and then swap these tokens using that existing contracts and we mint a new possition in that existing poos and provide the liqudity.
 
 We run the fork node using `npx hardhat node --fork https://eth-goerli.g.alchemy.com/v2/Pk45XQqmiWuKjwka4DYOOxeE4Ia8Wtix --fork-block-number 8374286` and use `wethContract` which availabel in this fork network then give the weth and get the `DAI` using the `exectInputSingle` method and then mint new possition and provide the liqudity using `mintNewPossition` method.
 
 
 
-## 12. Some features or functions:
+## 14. Some features or functions:
   1. **deployNewPool:** NonfungiblePositionManagerContract.createAndInitializePoolIfNecessary()
   2. **verifyPool:** FactoryContract.getPool()
   3. **mintNewPossition:** NonfungiblePositionManagerContract.mint()
