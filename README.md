@@ -62,101 +62,15 @@ if we use uniswap github contracts then we follow these steps before the deploy:
 - `git clone https://github.com/Uniswap/v3-periphery.git` and past contracts directory into our `contracts`
 - `git clone https://github.com/Uniswap/v3-core.git` and past contracts directory into our `contracts`
 
-- set the `hardhat.config.js` compiler settings:
-```
-const {subtask} = require("hardhat/config");
-const {TASK_COMPILE_SOLIDITY_GET_SOURCE_PATHS} = require("hardhat/builtin-tasks/task-names")
+- set the `hardhat.config.js` compiler settings according to the current configuration:
 
-subtask(TASK_COMPILE_SOLIDITY_GET_SOURCE_PATHS)
-  .setAction(async (_, __, runSuper) => {
-    const paths = await runSuper();
+- run `npx hardhat compile` three time for these contracts with differen compilor settings: (comment these lines one by one): 
+    1. return paths.filter(p => p.includes("v3-core"));
+    2. return paths.filter(p => p.includes("v3-periphery"));
+    3. return paths.filter(p => p.includes("contracts") && !p.includes("v3-core"));
+    4. compilers: [CORE_COMPILER_SETTINGS],
+    5. compilers: [DEFAULT_COMPILER_SETTINGS],
 
-    // return paths.filter(p => p.includes("v3-periphery"));
-    return paths.filter(p => p.includes("v3-core"));
-    // return paths.filter(p => p.includes("contracts"));
-
-  });
-
-const LOW_OPTIMIZER_COMPILER_SETTINGS = {
-  version: '0.7.6',
-  settings: {
-    evmVersion: 'istanbul',
-    optimizer: {
-      enabled: true,
-      runs: 2_000,
-    },
-    metadata: {
-      bytecodeHash: 'none',
-    },
-  },
-}
-
-const LOWEST_OPTIMIZER_COMPILER_SETTINGS = {
-  version: '0.7.6',
-  settings: {
-    evmVersion: 'istanbul',
-    optimizer: {
-      enabled: true,
-      runs: 1_000,
-    },
-    metadata: {
-      bytecodeHash: 'none',
-    },
-  },
-}
-
-const DEFAULT_COMPILER_SETTINGS = {
-  version: '0.7.6',
-  settings: {
-    evmVersion: 'istanbul',
-    optimizer: {
-      enabled: true,
-      runs: 1_000_000,
-    },
-    metadata: {
-      bytecodeHash: 'none',
-    },
-  },
-}
-
-
-const CORE_COMPILER_SETTINGS = {
-  version: '0.7.6',
-  settings: {
-    optimizer: {
-      enabled: true,
-      runs: 800,
-    },
-    metadata: {
-      bytecodeHash: 'none',
-    },
-  },
-}
-
-
-
-
-module.exports = {
-  solidity: {
-    // compilers: [DEFAULT_COMPILER_SETTINGS],
-    compilers: [CORE_COMPILER_SETTINGS],
-    overrides: {
-      'contracts/v3-periphery/NonfungiblePositionManager.sol': LOW_OPTIMIZER_COMPILER_SETTINGS,
-      'contracts/v3-periphery/NonfungibleTokenPositionDescriptor.sol': LOWEST_OPTIMIZER_COMPILER_SETTINGS,
-      'contracts/v3-periphery/libraries/NFTDescriptor.sol': LOWEST_OPTIMIZER_COMPILER_SETTINGS,
-    },
-  },
-};
-```
-- comments these two lines in `hardhat.config.js` and run `npx hardhat compile` 
-    1. return paths.filter(p => p.includes("v3-periphery"));
-    2. return paths.filter(p => p.includes("v3-core"));
-
-
-
-- then comment these two lines in `hardhat.config.js` and run `npx hardhat compile` 
-    1. return paths.filter(p => p.includes("v3-periphery"));
-    2. return paths.filter(p => p.includes("contracts")); 
 
 <br>
 <br>
@@ -193,7 +107,7 @@ In `scripts/contractInstances.js` script fetch all the ABIs from artifacts and f
 After deploying the contract now our DEX is running now we will do these tasks one by one:
 
 #### 1. create new pool: 
-run `npx hardhat run --network localhost scripts/03_deployPools.js` in this script we use `NonfungiblePositionManager` Contract and use `createAndInitializePoolIfNecessary` method of this contract for creating the pool and this method get the signer and these perametters:
+run `npx hardhat run --network localhost scripts/03_deployPools.js` in this script we use `NonfungiblePositionManager` Contract and use `createAndInitializePoolIfNecessary` method of this contract for creating two pools with different fool fee and this method get the signer and these perametters:
   1. token 0 address
   2. token 1 address
   3. pool fee
@@ -206,7 +120,7 @@ in privious script we use `V3Factory Contract` for getiing the pool address and 
   3. pool fee
 
 #### 3. mint new possition and provide liqudity:
-run `npx hardhat run --network localhost scripts/04_mintPosition.js` in this script we use `Usdt and Usdc` contracts instance for giving the token approval to `v3 possition manager` and use `Pool Contract` instance for getting the pool info and we will set the protocole fee using the `setFeeProtocol` method of this contract and we use `NonfungiblePositionManager Contract` and use the `mint` method of this contract that will mint the new possition and provide liquid and return the NFT according to our liqudity this `mint` method get the signer and get these perams:
+run `npx hardhat run --network localhost scripts/04_mintPosition.js` in this script we use `Usdt and Usdc` contracts instance for giving the token approval to `v3 possition manager` and use two `Pool Contracts` instance that we deploy in perivious script for getting the pool info and we will set the protocole fee using the `setFeeProtocol` method of each pool and we use `NonfungiblePositionManager Contract` and use the `mint` method of this contract that will mint the new possition and provide liquid in both pools and return the NFT according to our liqudity, this `mint` method get the signer and get these perams:
   1. token 0 address
   2. token 1 address
   3. pool fee
@@ -314,7 +228,13 @@ We run the fork node using `npx hardhat node --fork https://eth-goerli.g.alchemy
 
 
 
-## 14. Some features or functions:
+## 14. flashSwap:
+run `npx hardhat run --network localhost scripts/17_FlashSwap.js` in this script we deploy `FlashSwap` contract and pass `SWAP_ROUTER_ADDRESS`, `FACTORY_ADDRESS`, `WETH_ADDRESS` to the constructor. After that we call `initFlash` function and pass the require params then it will get the loan from one pool and use it on other pool then return that loan in same transaction to the previous pool.
+
+NOTE: `FlashSwap` will use the `flash` methor of that pool for getting the loan. 
+
+
+# Some features or functions:
   1. **deployNewPool:** NonfungiblePositionManagerContract.createAndInitializePoolIfNecessary()
   2. **verifyPool:** FactoryContract.getPool()
   3. **mintNewPossition:** NonfungiblePositionManagerContract.mint()
@@ -331,6 +251,7 @@ We run the fork node using `npx hardhat node --fork https://eth-goerli.g.alchemy
   14. **swapUsingExactOutputSingle:** SwapRouterContract.exactOutputSingle()
   15. **swapUsingExactInputSingle:** SwapRouterContract.exactInput()
   16. **swapUsingExactInputSingle:** SwapRouterContract.exactOutput() 
+  17. **flashSwap:** FlashSwap.initFlash() 
   
 
 

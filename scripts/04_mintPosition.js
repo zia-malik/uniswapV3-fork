@@ -2,7 +2,7 @@ const {
   WETH_ADDRESS, FACTORY_ADDRESS, SWAP_ROUTER_ADDRESS, 
   NFT_DESCRIPTOR_ADDRESS, POSITION_DESCRIPTOR_ADDRESS, 
   POSITION_MANAGER_ADDRESS, TETHER_ADDRESS, USDC_ADDRESS, WRAPPED_BITCOIN_ADDRESS,
-  POOL_USDT_USDC_500
+  POOL_USDT_USDC_500, POOL_USDT_USDC_3000
 } = require('./addresses.js');
 
 const {
@@ -37,14 +37,7 @@ async function getPoolData(poolContract) {
   }
 }
 
-async function main() {
-
-  const [owner, signer2] = await ethers.getSigners();
-  await Usdt_Contract.connect(signer2).approve(POSITION_MANAGER_ADDRESS, ethers.utils.parseEther('1000'))
-  await Usdc_Contract.connect(signer2).approve(POSITION_MANAGER_ADDRESS, ethers.utils.parseEther('1000'))
-
-  const poolContract = PoolContract(POOL_USDT_USDC_500);
-
+async function mintPossition(owner, signer, poolContract, liquidity){
   // setFeeProtocol
   const set_tx =  await poolContract.connect(owner).setFeeProtocol(4, 4);
   console.log("set protocolFees logs: ", (await set_tx.wait()).events.find(event => event.event === 'SetFeeProtocol').args);
@@ -65,7 +58,7 @@ async function main() {
 
   const position = new Position({
     pool: pool,
-    liquidity: ethers.utils.parseEther('1'),
+    liquidity: ethers.utils.parseEther(liquidity),
     tickLower: nearestUsableTick(poolData.tick, poolData.tickSpacing) - poolData.tickSpacing * 2,
     tickUpper: nearestUsableTick(poolData.tick, poolData.tickSpacing) + poolData.tickSpacing * 2,
   })
@@ -82,12 +75,12 @@ async function main() {
     amount1Desired: amount1Desired.toString(),
     amount0Min: 0,
     amount1Min: 0,
-    recipient: signer2.address,
+    recipient: signer.address,
     deadline: Math.floor(Date.now() / 1000) + (60 * 10)
   }
 
 
-  const tx = await NonfungiblePositionManager_Contract.connect(signer2).mint(
+  const tx = await NonfungiblePositionManager_Contract.connect(signer).mint(
     params,
     { gasLimit: '1000000' }
   )
@@ -97,6 +90,21 @@ async function main() {
   console.log("EVENT1-----------", event1)
   let value = event1.args[0]
   console.log("VALUE---------", value)
+}
+
+async function main() {
+
+  const [owner, signer2] = await ethers.getSigners();
+  await Usdt_Contract.connect(signer2).approve(POSITION_MANAGER_ADDRESS, ethers.utils.parseEther('10'))
+  await Usdc_Contract.connect(signer2).approve(POSITION_MANAGER_ADDRESS, ethers.utils.parseEther('10'))
+
+  const poolContract500 = PoolContract(POOL_USDT_USDC_500);
+  await mintPossition(owner, signer2, poolContract500, '2');
+
+  const poolContract3000 = PoolContract(POOL_USDT_USDC_3000);
+  await mintPossition(owner, signer2, poolContract3000, '2');
+
+  
 }
 
 /*
