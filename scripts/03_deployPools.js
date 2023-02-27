@@ -49,6 +49,9 @@ async function deployPool(token0, token1, fee, price) {
 async function main() {
   const usdtUsdc500 = await deployPool(TETHER_ADDRESS, USDC_ADDRESS, 500, encodePriceSqrt(1, 1))
   console.log('POOL_USDT_USDC_500:', `'${usdtUsdc500}',`)
+
+  const usdtUsdc3000 = await deployPool(TETHER_ADDRESS, USDC_ADDRESS, 3000, encodePriceSqrt(1, 1))
+  console.log('POOL_USDT_USDC_3000:', `'${usdtUsdc3000}',`)
 }
 
 /*
