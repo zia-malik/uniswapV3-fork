@@ -5911,6 +5911,164 @@
       "artifacts": [
         "NonfungiblePositionManager"
       ]
+    },
+    "/home/abdullah/ethereum/foxswap-dex/contracts/v2-core/IUniswapV2Factory.sol": {
+      "lastModificationDate": 1677227072293,
+      "contentHash": "c1b36b46a276aed7e0954e0036e050c8",
+      "sourceName": "contracts/v2-core/IUniswapV2Factory.sol",
+      "solcConfig": {
+        "version": "0.7.6",
+        "settings": {
+          "evmVersion": "istanbul",
+          "optimizer": {
+            "enabled": true,
+            "runs": 1000000
+          },
+          "metadata": {
+            "bytecodeHash": "none"
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        ">=0.5.0"
+      ],
+      "artifacts": [
+        "IUniswapV2Factory"
+      ]
+    },
+    "/home/abdullah/ethereum/foxswap-dex/contracts/v2-periphery/IUniswapV2Router01.sol": {
+      "lastModificationDate": 1677227072361,
+      "contentHash": "3526c6d8e16194c21ba5df9314876f13",
+      "sourceName": "contracts/v2-periphery/IUniswapV2Router01.sol",
+      "solcConfig": {
+        "version": "0.7.6",
+        "settings": {
+          "evmVersion": "istanbul",
+          "optimizer": {
+            "enabled": true,
+            "runs": 1000000
+          },
+          "metadata": {
+            "bytecodeHash": "none"
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        ">=0.6.2"
+      ],
+      "artifacts": [
+        "IUniswapV2Router01"
+      ]
+    },
+    "/home/abdullah/ethereum/foxswap-dex/contracts/v2-periphery/IUniswapV2Router02.sol": {
+      "lastModificationDate": 1677227072361,
+      "contentHash": "0b40738178248d5a550bcb99b5451260",
+      "sourceName": "contracts/v2-periphery/IUniswapV2Router02.sol",
+      "solcConfig": {
+        "version": "0.7.6",
+        "settings": {
+          "evmVersion": "istanbul",
+          "optimizer": {
+            "enabled": true,
+            "runs": 1000000
+          },
+          "metadata": {
+            "bytecodeHash": "none"
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./IUniswapV2Router01.sol"
+      ],
+      "versionPragmas": [
+        ">=0.6.2"
+      ],
+      "artifacts": [
+        "IUniswapV2Router02"
+      ]
+    },
+    "/home/abdullah/ethereum/foxswap-dex/contracts/v2-core/IUniswapV2Pair.sol": {
+      "lastModificationDate": 1677243344564,
+      "contentHash": "1d4d8e255a202a54b00503590bd11e30",
+      "sourceName": "contracts/v2-core/IUniswapV2Pair.sol",
+      "solcConfig": {
+        "version": "0.7.6",
+        "settings": {
+          "evmVersion": "istanbul",
+          "optimizer": {
+            "enabled": true,
+            "runs": 1000000
+          },
+          "metadata": {
+            "bytecodeHash": "none"
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        ">=0.5.0"
+      ],
+      "artifacts": [
+        "IUniswapV2Pair"
+      ]
     }
   }
 }
