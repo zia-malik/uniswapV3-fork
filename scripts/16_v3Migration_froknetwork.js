@@ -1,26 +1,50 @@
 // npx hardhat node --fork https://eth-goerli.g.alchemy.com/v2/Pk45XQqmiWuKjwka4DYOOxeE4Ia8Wtix --fork-block-number 8374286
 // npx hardhat node --fork https://eth-mainnet.g.alchemy.com/v2/ZvmdipXxS6C0HUcHs7MqZCnWVt-0m3rr
 
-
 const { ethers} = require("hardhat");
 const { Contract, BigNumber } = require("ethers");
+const { Pool, Position, nearestUsableTick } = require('@uniswap/v3-sdk')
 const { Token } = require('@uniswap/sdk-core');
-const { Pool, Position, nearestUsableTick } = require('@uniswap/v3-sdk');
+const WETH9 = require("../WETH9.json")
+
+const Web3Eth  = require("web3-eth");
+const eth = new Web3Eth('http://localhost:8545');
+//onst { Pool, Position, nearestUsableTick } = require('@uniswap/v3-sdk');
 
 
+const {
+  WETH_ADDRESS, FACTORY_ADDRESS, SWAP_ROUTER_ADDRESS, 
+  NFT_DESCRIPTOR_ADDRESS, POSITION_DESCRIPTOR_ADDRESS, 
+  POSITION_MANAGER_ADDRESS, TETHER_ADDRESS, USDC_ADDRESS, WRAPPED_BITCOIN_ADDRESS,
+  POOL_USDT_USDC_500, POOL_WBTC_USDC_500, 
+} = require('./addresses.js');
+
+const {
+  NonfungiblePositionManager_Contract, Factory_Contract, Usdt_Contract, Usdc_Contract,
+  WBTC_Contract, PoolContract, SwapRouter_Contract
+} = require('./contractInstances');
+const { CompilationJobCreationErrorReason } = require("hardhat/types");
+
+
+const V2_FACTORY_ADDRESS = '0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f';
+const V3_SWAP_ROUTER_ADDRESS = '0xE592427A0AEce92De3Edee1F18E0157C05861564';
+const V3_FACTORY_ADDRESS = '0x1F98431c8aD98523631AE4a59f267346ea31F984';
+const V3_POSITION_MANAGER_ADDRESS = '0xC36442b4a4522E871399CD717aBDD847Ab11FE88';
+const V3MIGRATOR_ADDRESS = "0xA5644E29708357803b5A882D272c41cC0dF92B34";
 
 const WETH = '0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6';
-const SWAP_ROUTER_ADDRESS = '0xE592427A0AEce92De3Edee1F18E0157C05861564';
 const DAI = '0x5C221E77624690fff6dd741493D735a17716c26B';
-const FACTORY_ADDRESS = '0x1F98431c8aD98523631AE4a59f267346ea31F984';
-const POSITION_MANAGER_ADDRESS= '0xC36442b4a4522E871399CD717aBDD847Ab11FE88';
 
 
 const artifacts = {
-  SwapRouter: require("../artifacts/contracts/v3-periphery/SwapRouter.sol/SwapRouter.json"),
-  UniswapV3Pool: require("@uniswap/v3-core/artifacts/contracts/UniswapV3Pool.sol/UniswapV3Pool.json"),
-  UniswapV3Factory: require("../artifacts/contracts/v3-core/UniswapV3Factory.sol/UniswapV3Factory.json"),
-  NonfungiblePositionManager: require("@uniswap/v3-periphery/artifacts/contracts/NonfungiblePositionManager.sol/NonfungiblePositionManager.json"),
+  V2_SwapRouter: require("../artifacts/contracts/v2-periphery/IUniswapV2Router02.sol/IUniswapV2Router02.json"), 
+  V2_Factory: require("../artifacts/contracts/v2-core/IUniswapV2Factory.sol/IUniswapV2Factory.json"),
+  V3_SwapRouter: require("../artifacts/contracts/v3-periphery/SwapRouter.sol/SwapRouter.json"),
+  V3_Pool: require("@uniswap/v3-core/artifacts/contracts/UniswapV3Pool.sol/UniswapV3Pool.json"),
+  V3_Factory: require("../artifacts/contracts/v3-core/UniswapV3Factory.sol/UniswapV3Factory.json"),
+  V3_NonfungiblePositionManager: require("@uniswap/v3-periphery/artifacts/contracts/NonfungiblePositionManager.sol/NonfungiblePositionManager.json"),
+  V2_IUniswapV2Pair: require("../artifacts/contracts/v2-core/IUniswapV2Pair.sol/IUniswapV2Pair.json"),
+  V3_Migrator: require("../artifacts/contracts/v3-periphery/V3Migrator.sol/V3Migrator.json")
 };
 
 
@@ -47,136 +71,44 @@ async function getPoolData(poolContract) {
 }
 
 
-async function exectInputSingle(signer, swaprouter, tokenInContract, tokenOutContract, tokenIn, TokenOut, poolData, amountIn ){
-  await tokenInContract.connect(signer).approve(SWAP_ROUTER_ADDRESS, amountIn.toString())
+// async function v3migrate(_signer, _v2_poolContract, _tokenAContract, _tokenBContract, _tokenA, _tokenB, _v3migrator, _migrateParams) {
 
-  paramsExectInputSingle = {
-    tokenIn: tokenIn,
-    tokenOut: TokenOut,
-    fee: poolData.fee,
-    recipient: signer.address,
-    deadline: Math.floor(Date.now() / 1000) + (60 * 10),
-    amountIn: amountIn.toString(),
-    amountOutMinimum: 0,
-    sqrtPriceLimitX96:0
-  }
+//   //  await _v2_poolContract.connect(signer).approve(_v3migrator.address, _migrateParams.liquidity)
+  
+
+// }
 
 
-  const tokenBalanceBefore = (await tokenOutContract.balanceOf(signer.address)).toString();
 
-  const tx = await swaprouter.connect(signer).exactInputSingle(
-    paramsExectInputSingle,
+async function addLiquidity(signer, swaprouter, tokenAContract, tokenBContract, tokenA, tokenB, amountADesired, amountBDesired, amountAMin, amountBMin){
+  await tokenAContract.connect(signer).approve(swaprouter.address, amountADesired.toString())
+
+  const tx = await swaprouter.connect(signer).addLiquidity(
+    tokenA, tokenB, amountADesired, amountBDesired, amountAMin, amountBMin, signer.address, Math.floor(Date.now() / 1000) + (60 * 10),
       { gasLimit: '30000000' }
   );
   await tx.wait();
 
-  const tokenBalanceAfter = (await tokenOutContract.balanceOf(signer.address)).toString();
-  const tokenBalanceDifference = ethers.utils.parseUnits(tokenBalanceAfter, 0)
-  .sub(ethers.utils.parseUnits(tokenBalanceBefore, 0)).toString();
-  console.log("paramsExectInputSingle DAI balance after: ", tokenBalanceDifference);
-}
-
-
-async function getTokenWETHandDAI(){
-  const WETH_Token = new Token(31337, WETH, 18, 'WETH', 'Wrapped Ether');
-  const DAI_Token = new Token(31337, DAI, 18, 'DAI', 'DAI');
-  return {WETH_Token, DAI_Token}; 
-}
-
-async function getPositionManager(provider){
-  return new ethers.Contract(
-    POSITION_MANAGER_ADDRESS,
-    artifacts.NonfungiblePositionManager.abi,
-    provider
-  );
-}
-
-
-async function mintNewPossition(signer, provider, poolData, tokenAContract, tokenBContract) {
-  console.log("token0 Address: ", poolData.token0, "\ntoken1 Address: ", poolData.token1);
-  const {WETH_Token, DAI_Token} = await getTokenWETHandDAI();
-  const pool = new Pool(
-    DAI_Token,
-    WETH_Token,
-    poolData.fee,
-    poolData.sqrtPriceX96.toString(),
-    poolData.liquidity.toString(),
-    poolData.tick
-  )
-
-  const tickLower = nearestUsableTick(poolData.tick, poolData.tickSpacing) - poolData.tickSpacing * 1;
-  const tickUpper = nearestUsableTick(poolData.tick, poolData.tickSpacing) + poolData.tickSpacing * 1;
-  const position = new Position({
-    pool: pool,
-    liquidity: 100000,
-    tickLower: tickLower,
-    tickUpper: tickUpper,
-  })
-
-  const { amount0: amount0Desired, amount1: amount1Desired} = position.mintAmounts
-  console.log("Desired amount0: ", amount0Desired.toString(), ", amount1: ", amount1Desired.toString());
-
-  await tokenAContract.connect(signer).approve(POSITION_MANAGER_ADDRESS, ethers.utils.parseEther(amount0Desired.toString()));
-  await tokenBContract.connect(signer).approve(POSITION_MANAGER_ADDRESS, ethers.utils.parseEther(amount1Desired.toString()));
-
-
-  params = {
-    token0: poolData.token0,
-    token1: poolData.token1,
-    fee: poolData.fee,
-    tickLower: tickLower,
-    tickUpper: tickUpper,
-    amount0Desired: amount0Desired.toString(),
-    amount1Desired: amount1Desired.toString(),
-    amount0Min: 0,
-    amount1Min: 0,
-    recipient: signer.address,
-    deadline: Math.floor(Date.now() / 1000) + (60 * 10)
-  }
-
-  const nonfungiblePositionManager = await getPositionManager(provider);
-  const tx = await nonfungiblePositionManager.connect(signer).mint(
-    params,
-    { gasLimit: '1000000' }
-  )
-
-  const receipt = await tx.wait()
-  // console.log("\ntx receipt: ", receipt);
-  console.log("\ntx Event: ", receipt.events);
+  const tokenBalanceAfter = await getTokenBalance(tokenAContract, tokenBContract, signer.address);
+  console.log("\ntoken balance: ", tokenBalanceBefore, "\n\n",tokenBalanceAfter);
 }
 
 
 
-async function collectFee(signer, provider, tokenId, amount0Max, amount1Max){
-  paramsCollectFee = {
-    tokenId: tokenId,
-    recipient:   signer.address,
-    amount0Max: amount0Max,
-    amount1Max: amount1Max,
-  }
-
-  const nonfungiblePositionManager = await getPositionManager(provider);
-  const tx = await nonfungiblePositionManager.connect(signer).collect(paramsCollectFee, {gasLimit:"218520"});
-  const receipt = await tx.wait();
-
-  const event1 = await receipt.events[2];
-  console.log("Event 1: ", event1)
-  let value1 = event1.args[0]
-  console.log("Value 1: ", value1)
-  let value2 = event1.args[1]
-  console.log("Value 2: ", value2)
-  let value3 = event1.args[2]
-  console.log("Value 3: ", value3)
-  let value4 = event1.args[3]
-  console.log("Value 4: ", value4)
+async function getEvent(tx, contractAddress, contractABI, eventName){
+  eth.getTransactionReceipt(tx)
+  .then((rcpt)=>{
+      rcpt.logs.filter( log => log.address === contractAddress).map((log) => {
+          const eventAbi = contractABI.find(event => event?.name === eventName);
+          if (log.topics[0] === eth.abi.encodeEventSignature(eventAbi)){
+              const tInfo = eth.abi.decodeLog(eventAbi.inputs, log.data, log.topics);
+              console.log("\n\nToken Info: ", tInfo);
+          }
+      });
+  });
 }
 
 
-async function getPosition(signer, provider, tokenId){
-  const nonfungiblePositionManager = await getPositionManager(provider);
-  const positions = await nonfungiblePositionManager.connect(signer).positions(tokenId, {gasLimit:"218520"});
-  console.log("positions: ", positions);
-}
 
 
 (async ()=>{
@@ -185,42 +117,79 @@ async function getPosition(signer, provider, tokenId){
   const [owner, signer2] = await ethers.getSigners();
   const provider = signer2.provider;
 
-  const factory = new Contract(FACTORY_ADDRESS, artifacts.UniswapV3Factory.abi, provider);
-  const poolAddress = await factory.connect(owner).getPool( WETH, DAI, 3000);
-  console.log("poolAddress: ", poolAddress);
+  const v3_migrator = new Contract(V3MIGRATOR_ADDRESS, artifacts.V3_Migrator.abi, provider);
+  const v3_factory = new Contract(V3_FACTORY_ADDRESS, artifacts.V3_Factory.abi, provider);
+  const v3_poolAddress = await v3_factory.connect(owner).getPool( WETH, DAI, 3000);
+  console.log("v3_poolAddress: ", v3_poolAddress);
 
-  const poolContract = new Contract(poolAddress, artifacts.UniswapV3Pool.abi, provider);
-  const poolData = await getPoolData(poolContract);
-  console.log("poolData: ", poolData);
+  const v2_factory = new Contract(V2_FACTORY_ADDRESS, artifacts.V2_Factory.abi, provider);
+  const v2_poolAddress = await v2_factory.connect(owner).getPair( WETH, DAI);
+ // console.log("poolAddress: ", v2_poolAddress);
+  const v2_poolContract = new Contract("0x8Db6060D931E4b67343D85fb4e2355b4c96353B2", artifacts.V2_IUniswapV2Pair.abi, provider);
 
-  // let amountIn = 100000;
-  let amountIn = ethers.utils.parseEther('2')
-  // await wethContract.connect(owner).deposit({ value: amountIn });
-  amountIn = (await wethContract.connect(owner).balanceOf(owner.address)).toString();
-  console.log("wethContract balance: ", amountIn);
-
-  const swaprouter = new ethers.Contract(
-    SWAP_ROUTER_ADDRESS, 
-    artifacts.SwapRouter.abi,
+  const v3_poolContract = new Contract(v3_poolAddress, artifacts.V3_Pool.abi, provider);
+  const v3_poolData = await getPoolData(v3_poolContract);
+  console.log("poolData: ", v3_poolData);
+  Math.floor(Date.now() / 1000) + (60 * 10)
+  const v3_swaprouter = new ethers.Contract(
+    V3_SWAP_ROUTER_ADDRESS, 
+    artifacts.V3_SwapRouter.abi,
     provider,
   );
 
-  // await exectInputSingle(owner, swaprouter, wethContract, daiContract, WETH, DAI, poolData, amountIn);
-  // await exectInputSingle(owner, swaprouter, daiContract, wethContract, DAI, WETH, poolData, 1000000000000000);
+  const poolData = await getPoolData(v3_poolContract);
+
+
+  MigrateParams = {
+    pair: '0x8Db6060D931E4b67343D85fb4e2355b4c96353B2', //v2 pool
+    liquidityToMigrate: 6212993987569,
+    percentageToMigrate: 50,
+    token0: DAI,
+    token1: WETH,
+    fee: 3000,
+    tickLower: nearestUsableTick(poolData.tick, poolData.tickSpacing) - poolData.tickSpacing * 2,
+    tickUpper: nearestUsableTick(poolData.tick, poolData.tickSpacing) + poolData.tickSpacing * 2,
+    amount0Min: 0,
+    amount1Min: 0,
+    recipient: owner.address,
+    deadline: Math.floor(Date.now() / 1000) + (60 * 10),
+    refundAsETH: false
+  };
+
+  await v2_poolContract.connect(owner).approve(v3_migrator.address, MigrateParams.liquidityToMigrate);
+  let tx = await v3_migrator.connect(owner).migrate(
+    MigrateParams,
+    { gasLimit: '30000000'}
+  );
+
+  // tx = await tx.wait();
+
+  // console.log("transaction data: ",tx.events.map(async event => {
+  //   console.log(await event.getTransaction);
+  //   console.log(await event.getTransactionReceipt);
+  // }));
+
+  // console.log("event 0: ", await tx.events[0].getTransaction);
   
-  const tokenBBalance = (await wethContract.balanceOf(owner.address)).toString();
-  const tokenABalance = (await daiContract.balanceOf(owner.address)).toString();
-  console.log("WETH BAlance: ", tokenBBalance);
-  console.log("DAI BAlance: ", tokenABalance);
+  // console.log("EventFlashSwap event: ", (await tx.wait()).events.filter(event => event.event === 'IncreaseLiquidity').map(e => e.args));
+  // console.log("tx: ", tx.hash);
 
-  // await mintNewPossition(owner, provider, poolData, daiContract, wethContract);
 
-  const tokenID = 51842;
-  // await getPosition(owner, provider, tokenID);
-  // await collectFee(owner, provider, tokenID, 1000, 1000,);
+  await getEvent(tx.hash, V3_POSITION_MANAGER_ADDRESS, artifacts.V3_NonfungiblePositionManager.abi, 'Transfer');
+
+
+
+
+
+
+//  const nonfungiblePositionManager = new ethers.Contract(
+//     V3_POSITION_MANAGER_ADDRESS,
+//     artifacts.V3_NonfungiblePositionManager.abi,
+//     provider
+//   );
+
+//   console.log("Token info", (await nonfungiblePositionManager.connect(owner).positions('10000000000000000')).toString())
 })()
-
-
 
 
 /*
@@ -230,6 +199,6 @@ npx hardhat run --network localhost scripts/02_deployTokens.js
 npx hardhat run --network localhost scripts/03_deployPools.js
 npx hardhat run --network localhost scripts/04_mintPosition.js
 clear
-npx hardhat run --network localhost scripts/17_FlashSwap.js
+npx hardhat run --network localhost scripts/16_v3Migration_froknetwork.js
 
 */
